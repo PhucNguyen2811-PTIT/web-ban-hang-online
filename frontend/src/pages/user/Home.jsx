@@ -29,16 +29,6 @@ export default function Home() {
         <Carousel />
       </section>
 
-      {/* banner */}
-      <section className="bg-blue-100 py-10 rounded-lg mb-10">
-        <h1 className="text-3xl font-bold text-gray-800">
-          Chào mừng đến ShopLaptop
-        </h1>
-        <p className="mt-3 text-gray-600">
-          Nơi mua sắm trực tuyến với sản phẩm chất lượng & giá tốt.
-        </p>
-      </section>
-
       {/* sản phẩm nổi bật */}
       <section>
         <h2 className="text-2xl font-semibold mb-6 text-gray-800">
