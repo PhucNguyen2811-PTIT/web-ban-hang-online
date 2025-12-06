@@ -1,26 +1,19 @@
+import { useEffect, useState } from "react";
 import Carousel from "../../components/Carousel";
+import ProductCard from "../../components/ProductCard";
 
 export default function Home() {
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "HP Victus 15",
-      price: 15000000,
-      image: "https://via.placeholder.com/200",
-    },
-    {
-      id: 2,
-      name: "Dell Latitude",
-      price: 55000000,
-      image: "https://via.placeholder.com/200",
-    },
-    {
-      id: 3,
-      name: "Lenovo Legion 5 Pro",
-      price: 35000000,
-      image: "https://via.placeholder.com/200",
-    },
-  ];
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("http://localhost:5000/api/products")
+      .then((res) => res.json())
+      .then((data) => {
+        setFeaturedProducts(data);
+        setLoading(false);
+      });
+  }, []);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -29,33 +22,23 @@ export default function Home() {
         <Carousel />
       </section>
 
-      {/* sản phẩm nổi bật */}
-      <section>
-        <h2 className="text-2xl font-semibold mb-6 text-gray-800">
-          Sản phẩm nổi bật
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {featuredProducts.map((p) => (
-            <div
-              key={p.id}
-              className="border rounded-xl shadow hover:shadow-lg transition bg-white"
-            >
-              <img
-                src={p.image}
-                alt={p.name}
-                className="w-full h-48 object-cover rounded-t-xl"
-              />
-              <div className="p-3 text-center">
-                <h3 className="font-medium text-gray-800">{p.name}</h3>
-                <p className="text-blue-600 font-semibold">
-                  {p.price.toLocaleString()}đ
-                </p>
-                <button className="mt-2 px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                  Thêm vào giỏ
-                </button>
-              </div>
-            </div>
-          ))}
+      <section className="mb-10">
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+            Sản phẩm nổi bật
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {loading
+              ? Array.from({ length: 4 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="border rounded-xl shadow animate-pulse h-72 bg-gray-200"
+                  ></div>
+                ))
+              : featuredProducts.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+          </div>
         </div>
       </section>
     </div>

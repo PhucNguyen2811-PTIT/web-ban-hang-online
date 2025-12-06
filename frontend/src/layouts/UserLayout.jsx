@@ -7,7 +7,7 @@ export default function UserLayout() {
     <>
       <Header />
       <main className=" p-4 bg-gray-50 w-full">
-        <Outlet /> {/* nội dung từng trang sẽ xuất hiện ở đây */}
+        <Outlet />
       </main>
       <Footer />
     </>
