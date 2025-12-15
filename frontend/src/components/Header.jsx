@@ -1,17 +1,26 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, ShoppingCart, User, Search } from "lucide-react";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext"; // path tùy bạn
+import { useContext, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { CartContext } from "../context/CartContext";
 
 const categories = ["Laptop HP", "Laptop Lenovo", "Laptop Asus", "Laptop Dell"];
 
 export default function Header() {
   const navigate = useNavigate();
   const { user, logout } = useContext(AuthContext);
+  const { cartItems } = useContext(CartContext);
+
+  const [keyword, setKeyword] = useState("");
 
   const handleLogout = () => {
     logout();
     navigate("/auth");
+  };
+
+  const handleSearch = () => {
+    if (!keyword.trim()) return;
+    navigate(`/products?search=${encodeURIComponent(keyword)}`);
   };
 
   return (
@@ -50,11 +59,15 @@ export default function Header() {
           <div className="relative">
             <input
               type="text"
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               placeholder="Tìm sản phẩm..."
               className="w-full px-5 py-2 pr-10 border border-gray-300 rounded-full placeholder-gray-400 text-gray-800 bg-white focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
             />
             <Search
               size={18}
+              onClick={handleSearch}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 cursor-pointer hover:text-blue-600"
             />
           </div>

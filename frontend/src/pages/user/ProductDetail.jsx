@@ -1,8 +1,12 @@
 import { useParams, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import SpecTable from "../../components/SpecTable";
+import { useContext } from "react";
+import { CartContext } from "../../context/CartContext";
 
 export default function ProductDetail() {
+  const { addToCart } = useContext(CartContext);
+
   const { id } = useParams();
   const location = useLocation();
   const preloadedProduct = location.state?.product || null;
@@ -35,6 +39,16 @@ export default function ProductDetail() {
 
     requestAnimationFrame(animateScroll);
   }, [id]);
+  function handleAddToCart() {
+    addToCart({
+      id: product.productID, // QUAN TRỌNG: id phải khớp CartContext
+      name: product.name,
+      price: product.discountPrice || product.price,
+      image: product.images?.[0],
+    });
+
+    alert("Đã thêm vào giỏ");
+  }
 
   // Trong ProductDetail.jsx, khi fetch product
   useEffect(() => {
@@ -45,13 +59,8 @@ export default function ProductDetail() {
         .then((data) => {
           console.log("Fetched product:", data);
 
-          // Chuyển specs từ mảng thành object
-          const specsObj = {};
-          data.specs.forEach((spec) => {
-            specsObj[spec.attribute] = spec.value;
-          });
+          setProduct(data);
 
-          setProduct({ ...data, specs: specsObj });
           setMainImage(data.images[0]);
           setLoading(false);
         })
@@ -112,7 +121,10 @@ export default function ProductDetail() {
           )}
 
           <p className="text-gray-700 mb-6">{product.description}</p>
-          <button className="px-6 py-3 bg-blue-600 text-white rounded-md text-lg hover:bg-blue-700">
+          <button
+            onClick={handleAddToCart}
+            className="px-6 py-3 bg-blue-600 text-white rounded-md text-lg hover:bg-blue-700"
+          >
             Thêm vào giỏ hàng
           </button>
         </div>
