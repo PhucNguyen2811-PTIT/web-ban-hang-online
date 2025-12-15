@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `laptop_shop` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `laptop_shop`;
 -- MySQL dump 10.13  Distrib 8.0.43, for Win64 (x86_64)
 --
 -- Host: localhost    Database: laptop_shop
@@ -146,10 +144,11 @@ CREATE TABLE `products` (
   `stock` int DEFAULT NULL,
   `createdAt` datetime DEFAULT CURRENT_TIMESTAMP,
   `updatedAt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `discountPrice` int DEFAULT NULL,
   PRIMARY KEY (`productID`),
   KEY `categoryID` (`categoryID`),
   CONSTRAINT `products_ibfk_1` FOREIGN KEY (`categoryID`) REFERENCES `category` (`categoryID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -158,6 +157,7 @@ CREATE TABLE `products` (
 
 LOCK TABLES `products` WRITE;
 /*!40000 ALTER TABLE `products` DISABLE KEYS */;
+INSERT INTO `products` VALUES (1,'HP Victus 15','Laptop gaming tầm trung, hiệu năng ổn định.',15000000.00,'[\n  \"https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_d_i_6_35.png\"\n]',NULL,NULL,'2025-11-21 18:55:11','2025-11-22 20:36:35',13500000),(2,'Lenovo Legion Pro','Laptop gaming cao cấp, dành cho sáng tạo nội dung',55000000.00,'[\n  \"https://cdn2.cellphones.com.vn/insecure/plain/https://cellphones.com.vn/media/catalog/product//t/e/text_d_i_8_3.png\"\n]',NULL,NULL,'2025-11-21 18:55:11','2025-11-22 20:50:53',13500000),(3,'Asus TUF F15','Laptop gaming tầm trung, hiệu năng tốt hơn.',16000000.00,'[\n  \"https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_d_i_5_6.png\"\n]',NULL,NULL,'2025-11-21 18:46:05','2025-11-22 20:55:58',15000000),(4,'Dell Vostro 3530','Laptop văn phòng cấu hình mạnh, pin trâu.',18000000.00,'[\"https://cdn2.cellphones.com.vn/insecure/rs:fill:358:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_659_2__8.png\"]',NULL,NULL,'2025-11-22 21:47:38','2025-11-22 21:47:38',17000000);
 /*!40000 ALTER TABLE `products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -176,7 +176,7 @@ CREATE TABLE `productspecs` (
   PRIMARY KEY (`specID`),
   KEY `productID` (`productID`),
   CONSTRAINT `productspecs_ibfk_1` FOREIGN KEY (`productID`) REFERENCES `products` (`productID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -185,6 +185,7 @@ CREATE TABLE `productspecs` (
 
 LOCK TABLES `productspecs` WRITE;
 /*!40000 ALTER TABLE `productspecs` DISABLE KEYS */;
+INSERT INTO `productspecs` VALUES (5,3,'cpu','Intel Core i7-13620HX'),(6,3,'ram','16GB DDR5 4800MHz'),(7,3,'gpu','NVIDIA RTX 4050 6GB'),(8,3,'battery','70Wh — dùng 6–7 tiếng'),(9,1,'cpu','Intel Core i5-12450H'),(10,1,'ram','16GB DDR5 4800MHz'),(11,1,'gpu','NVIDIA RTX 2050 4GB'),(12,1,'battery','70Wh — dùng 6–7 tiếng'),(13,2,'cpu','Intel Core i7-13650HX'),(14,2,'ram','16GB DDR5 4800MHz'),(15,2,'gpu','NVIDIA RTX 5050 8GB'),(16,2,'battery','70Wh — dùng 6–7 tiếng'),(17,1,'screen_size','15.6 inch'),(18,3,'screen_size','15.6 inch'),(19,2,'screen_size','15.3 inch'),(20,4,'cpu','Intel Core i5-1334U'),(21,4,'ram','16GB DDR4 2666 MHz'),(22,4,'gpu','Intel UHD Graphics'),(23,4,'screen_size','15.6 inch'),(24,4,'battery','80Wh — dùng 7–8 tiếng');
 /*!40000 ALTER TABLE `productspecs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -237,7 +238,7 @@ CREATE TABLE `users` (
   `updatedAt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userID`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -246,6 +247,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'abd','abd@gmail.com','$2b$10$sK69WYtUzO5RpMsSlCKrnu3Cm5zVJFqkawA7xWruc5GaDggW4/kyq','0123','user','2025-11-23 21:06:56','2025-11-23 21:06:56'),(2,'ert','nhp@gmail.com','$2b$10$OZ0Ma9osHRqHwIiI3p4icOG.v/gXyv9pEim4OFXv3X1PMuo7DHRc6','2233','user','2025-11-23 22:43:48','2025-11-23 22:43:48');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -258,4 +260,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-10 21:35:11
+-- Dump completed on 2025-12-06 10:28:18
