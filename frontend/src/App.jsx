@@ -8,11 +8,17 @@ import ProductsPage from "./pages/user/ProductsPage";
 import CartPage from "./pages/user/CartPage";
 import CheckoutPage from "./pages/user/CheckoutPage";
 
+// Import Admin pages
+import AdminLayout from "./pages/admin/AdminLayout";
+import ProductManager from "./pages/admin/ProductManager";
+import OrderManager from "./pages/admin/OrderManager";
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* User Routes */}
           <Route path="/" element={<UserLayout />}>
             <Route index element={<Home />} />
             <Route path="auth" element={<Auth />} />
@@ -20,6 +26,12 @@ function App() {
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+          </Route>
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="products" element={<ProductManager />} />
+            <Route path="orders" element={<OrderManager />} />
           </Route>
         </Routes>
       </BrowserRouter>
