@@ -23,7 +23,7 @@ process.on("unhandledRejection", (err) => {
 const pool = mysql.createPool({
   host: "localhost",
   user: "root",
-  password: "", // sửa đúng pass MySQL
+  password: "123456", // sửa đúng pass MySQL
   database: "laptop_shop", // tên schema
   waitForConnections: true,
   connectionLimit: 10,
@@ -58,7 +58,9 @@ function mapSpecsToObject(specs) {
 // ---- GET ALL PRODUCTS ----
 app.get("/api/products", async (req, res) => {
   try {
-    const [products] = await pool.query("SELECT * FROM products");
+    const [products] = await pool.query(
+      "SELECT * FROM products WHERE is_deleted = 0"
+    );
 
     for (let p of products) {
       const [specs] = await pool.query(
@@ -89,7 +91,7 @@ app.get("/api/products", async (req, res) => {
 app.get("/api/products/featured", async (req, res) => {
   try {
     const [products] = await pool.query(
-      "SELECT * FROM products WHERE featured = 1"
+      "SELECT * FROM products WHERE featured = 1 AND is_deleted = 0"
     );
 
     for (let p of products) {
@@ -123,7 +125,7 @@ app.get("/api/products/:id", async (req, res) => {
   const id = req.params.id;
   try {
     const [products] = await pool.query(
-      "SELECT * FROM products WHERE productID = ?",
+      "SELECT * FROM products WHERE productID = ? AND is_deleted = 0",
       [id]
     );
     if (products.length === 0)
@@ -399,18 +401,21 @@ app.get("/api/admin/orders", verifyToken, verifyAdmin, async (req, res) => {
       JOIN users u ON o.userID = u.userID 
       ORDER BY o.createdAt DESC
     `);
-    
+
     // Lấy chi tiết từng đơn
     for (let order of orders) {
-      const [items] = await pool.query(`
+      const [items] = await pool.query(
+        `
         SELECT oi.*, p.name as productName, p.image 
         FROM orderitems oi
         JOIN products p ON oi.productID = p.productID
         WHERE oi.orderID = ?
-      `, [order.orderID]);
+      `,
+        [order.orderID]
+      );
       order.items = items;
     }
-    
+
     res.json(orders);
   } catch (err) {
     console.error("Admin orders error:", err);
@@ -429,42 +434,71 @@ app.get("/api/categories", async (req, res) => {
 });
 
 /* ---- ADMIN: UPDATE ORDER STATUS ---- */
-app.put("/api/admin/orders/:id/status", verifyToken, verifyAdmin, async (req, res) => {
-  const { status } = req.body;
-  try {
-    await pool.query("UPDATE orders SET status = ? WHERE orderID = ?", [status, req.params.id]);
-    res.json({ message: "Cập nhật trạng thái thành công" });
-  } catch (err) {
-    console.error("Update status error:", err);
-    res.status(500).json({ error: "Lỗi server" });
+app.put(
+  "/api/admin/orders/:id/status",
+  verifyToken,
+  verifyAdmin,
+  async (req, res) => {
+    const { status } = req.body;
+    try {
+      await pool.query("UPDATE orders SET status = ? WHERE orderID = ?", [
+        status,
+        req.params.id,
+      ]);
+      res.json({ message: "Cập nhật trạng thái thành công" });
+    } catch (err) {
+      console.error("Update status error:", err);
+      res.status(500).json({ error: "Lỗi server" });
+    }
   }
-});
+);
 
 /* ---- ADMIN: CREATE PRODUCT ---- */
 app.post("/api/admin/products", verifyToken, verifyAdmin, async (req, res) => {
   // 1. Nhận thêm categoryID từ Frontend
-  const { name, price, discountPrice, stock, description, image, specs, categoryID } = req.body;
-  
-  const imageJson = Array.isArray(image) ? JSON.stringify(image) : JSON.stringify([image]);
+  const {
+    name,
+    price,
+    discountPrice,
+    stock,
+    description,
+    image,
+    specs,
+    categoryID,
+  } = req.body;
+
+  const imageJson = Array.isArray(image)
+    ? JSON.stringify(image)
+    : JSON.stringify([image]);
 
   const conn = await pool.getConnection();
   try {
     await conn.beginTransaction();
-    
+
     // 2. Thêm categoryID vào câu lệnh INSERT
     const [result] = await conn.query(
       "INSERT INTO products (name, price, discountPrice, stock, description, image, categoryID) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [name, price, discountPrice, stock, description, imageJson, categoryID || null]
+      [
+        name,
+        price,
+        discountPrice,
+        stock,
+        description,
+        imageJson,
+        categoryID || null,
+      ]
     );
     const productID = result.insertId;
 
     // Thêm specs
     if (specs && Array.isArray(specs)) {
       for (const s of specs) {
-         if(s.attribute && s.value) {
-            await conn.query("INSERT INTO productspecs (productID, attribute, value) VALUES (?, ?, ?)", 
-            [productID, s.attribute, s.value]);
-         }
+        if (s.attribute && s.value) {
+          await conn.query(
+            "INSERT INTO productspecs (productID, attribute, value) VALUES (?, ?, ?)",
+            [productID, s.attribute, s.value]
+          );
+        }
       }
     }
 
@@ -480,56 +514,92 @@ app.post("/api/admin/products", verifyToken, verifyAdmin, async (req, res) => {
 });
 
 /* ---- ADMIN: UPDATE PRODUCT ---- */
-app.put("/api/admin/products/:id", verifyToken, verifyAdmin, async (req, res) => {
-  // 1. Nhận categoryID
-  const { name, price, discountPrice, stock, description, image, specs, categoryID } = req.body;
-  const productID = req.params.id;
-  
-  const imageJson = Array.isArray(image) ? JSON.stringify(image) : JSON.stringify([image]);
+app.put(
+  "/api/admin/products/:id",
+  verifyToken,
+  verifyAdmin,
+  async (req, res) => {
+    // 1. Nhận categoryID
+    const {
+      name,
+      price,
+      discountPrice,
+      stock,
+      description,
+      image,
+      specs,
+      categoryID,
+    } = req.body;
+    const productID = req.params.id;
 
-  const conn = await pool.getConnection();
-  try {
-    await conn.beginTransaction();
-    
-    // 2. Thêm categoryID vào câu lệnh UPDATE
-    await conn.query(
-      "UPDATE products SET name=?, price=?, discountPrice=?, stock=?, description=?, image=?, categoryID=? WHERE productID=?",
-      [name, price, discountPrice, stock, description, imageJson, categoryID || null, productID]
-    );
+    const imageJson = Array.isArray(image)
+      ? JSON.stringify(image)
+      : JSON.stringify([image]);
 
-    // Cập nhật specs (Xóa cũ thêm mới)
-    if (specs && Array.isArray(specs)) {
-      await conn.query("DELETE FROM productspecs WHERE productID = ?", [productID]);
-      for (const s of specs) {
-         if(s.attribute && s.value) {
-            await conn.query("INSERT INTO productspecs (productID, attribute, value) VALUES (?, ?, ?)", 
-            [productID, s.attribute, s.value]);
-         }
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+
+      // 2. Thêm categoryID vào câu lệnh UPDATE
+      await conn.query(
+        "UPDATE products SET name=?, price=?, discountPrice=?, stock=?, description=?, image=?, categoryID=? WHERE productID=?",
+        [
+          name,
+          price,
+          discountPrice,
+          stock,
+          description,
+          imageJson,
+          categoryID || null,
+          productID,
+        ]
+      );
+
+      // Cập nhật specs (Xóa cũ thêm mới)
+      if (specs && Array.isArray(specs)) {
+        await conn.query("DELETE FROM productspecs WHERE productID = ?", [
+          productID,
+        ]);
+        for (const s of specs) {
+          if (s.attribute && s.value) {
+            await conn.query(
+              "INSERT INTO productspecs (productID, attribute, value) VALUES (?, ?, ?)",
+              [productID, s.attribute, s.value]
+            );
+          }
+        }
       }
-    }
 
-    await conn.commit();
-    res.json({ message: "Cập nhật sản phẩm thành công" });
-  } catch (err) {
-    await conn.rollback();
-    console.error("Update product error:", err);
-    res.status(500).json({ error: "Lỗi server" });
-  } finally {
-    conn.release();
+      await conn.commit();
+      res.json({ message: "Cập nhật sản phẩm thành công" });
+    } catch (err) {
+      await conn.rollback();
+      console.error("Update product error:", err);
+      res.status(500).json({ error: "Lỗi server" });
+    } finally {
+      conn.release();
+    }
   }
-});
-/* ---- ADMIN: DELETE PRODUCT ---- */
-app.delete("/api/admin/products/:id", verifyToken, verifyAdmin, async (req, res) => {
-  try {
-    // Foreign key trong SQL đã để ON DELETE CASCADE cho specs, nhưng ảnh trong tempcart/orderitems có thể chặn xóa nếu đã có đơn hàng
-    // Ở đây ta xóa mềm hoặc xóa cứng tùy nghiệp vụ. Xóa cứng:
-    await pool.query("DELETE FROM products WHERE productID = ?", [req.params.id]);
-    res.json({ message: "Xóa sản phẩm thành công" });
-  } catch (err) {
-    console.error("Delete product error:", err);
-    res.status(500).json({ error: "Không thể xóa sản phẩm (đang có trong đơn hàng hoặc lỗi DB)" });
+);
+/* ---- ADMIN: SOFT DELETE PRODUCT ---- */
+app.delete(
+  "/api/admin/products/:id",
+  verifyToken,
+  verifyAdmin,
+  async (req, res) => {
+    try {
+      await pool.query(
+        "UPDATE products SET is_deleted = 1 WHERE productID = ?",
+        [req.params.id]
+      );
+      res.json({ message: "Xóa sản phẩm thành công (soft delete)" });
+    } catch (err) {
+      console.error("Delete product error:", err);
+      res.status(500).json({ error: "Xóa sản phẩm thất bại" });
+    }
   }
-});
+);
+
 // ---- START SERVER ----
 const PORT = 5000;
 app.listen(PORT, () => {
