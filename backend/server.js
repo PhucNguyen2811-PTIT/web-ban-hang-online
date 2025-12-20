@@ -23,7 +23,7 @@ process.on("unhandledRejection", (err) => {
 const pool = mysql.createPool({
   host: "localhost",
   user: "root",
-  password: "123456", // sửa đúng pass MySQL
+  password: "", // sửa đúng pass MySQL
   database: "laptop_shop", // tên schema
   waitForConnections: true,
   connectionLimit: 10,
