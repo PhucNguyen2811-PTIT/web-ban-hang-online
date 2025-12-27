@@ -4,19 +4,27 @@ import { Edit, Trash2, Plus, Search, Save, X } from "lucide-react";
 
 const ProductManager = () => {
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [brands, setBrands] = useState([]);
+
+  const SPEC_TEMPLATE = [
+    { key: "cpu", label: "CPU" },
+    { key: "ram", label: "RAM" },
+    { key: "gpu", label: "GPU" },
+    { key: "battery", label: "Pin" },
+    { key: "screen", label: "Màn hình" },
+  ];
 
   // State form
   const [formData, setFormData] = useState({
     name: "",
+    brand: "",
     price: "",
     discountPrice: "",
     stock: "",
     description: "",
     image: "",
-    categoryID: "",
     specs: [],
   });
 
@@ -24,12 +32,10 @@ const ProductManager = () => {
   const fetchData = useCallback(async () => {
     try {
       const resProducts = await fetch("http://localhost:5000/api/products");
-      const dataProducts = await resProducts.json();
-      setProducts(dataProducts);
+      const resBrands = await fetch("http://localhost:5000/api/brands");
 
-      const resCats = await fetch("http://localhost:5000/api/categories");
-      const dataCats = await resCats.json();
-      setCategories(dataCats);
+      setProducts(await resProducts.json());
+      setBrands(await resBrands.json());
     } catch (err) {
       console.error("Lỗi tải dữ liệu:", err);
     }
@@ -49,14 +55,11 @@ const ProductManager = () => {
   const addSpec = () => {
     setFormData({
       ...formData,
-      specs: [...formData.specs, { attribute: "", value: "" }],
+      specs: SPEC_TEMPLATE.map((s) => ({
+        attribute: s.key,
+        value: "",
+      })),
     });
-  };
-
-  const removeSpec = (index) => {
-    const newSpecs = [...formData.specs];
-    newSpecs.splice(index, 1);
-    setFormData({ ...formData, specs: newSpecs });
   };
 
   const handleSpecChange = (index, field, value) => {
@@ -75,7 +78,7 @@ const ProductManager = () => {
       stock: "",
       description: "",
       image: "",
-      categoryID: "",
+      brand: "",
       specs: [],
     });
     // Cuộn lên đầu nhẹ nhàng
@@ -86,13 +89,22 @@ const ProductManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
+    const specsObject = {};
+    formData.specs.forEach((s) => {
+      if (s.attribute && s.value) {
+        specsObject[s.attribute] = s.value;
+      }
+    });
 
     const payload = {
-      ...formData,
-      image: [formData.image],
+      name: formData.name,
+      brand: formData.brand,
       price: Number(formData.price),
+      discountPrice: Number(formData.discountPrice) || 0,
       stock: Number(formData.stock),
-      categoryID: Number(formData.categoryID),
+      description: formData.description,
+      image: [formData.image],
+      specs: specsObject,
     };
 
     const method = isEditing ? "PUT" : "POST";
@@ -113,13 +125,12 @@ const ProductManager = () => {
       if (res.ok) {
         // --- KHÔNG DÙNG RELOAD() NỮA ---
         alert(isEditing ? "Đã cập nhật sản phẩm!" : "Đã thêm sản phẩm mới!");
-        
+
         // 1. Tải lại danh sách mới nhất từ server
-        await fetchData(); 
-        
+        await fetchData();
+
         // 2. Reset form về trạng thái ban đầu
-        handleCancel(); 
-        
+        handleCancel();
       } else {
         const errData = await res.json();
         alert("Lỗi: " + (errData.error || "Không thể lưu"));
@@ -160,24 +171,23 @@ const ProductManager = () => {
     if (product.images && product.images.length > 0) imgUrl = product.images[0];
 
     // Format specs: Chuyển gạch dưới thành khoảng trắng để dễ nhìn
-    const formattedSpecs = product.specs
-      ? Object.entries(product.specs).map(([key, value]) => ({
-          attribute: key.replace(/_/g, " "), // Ví dụ: "screen_size" -> "screen size"
-          value: value,
-        }))
-      : [];
+    const formattedSpecs = SPEC_TEMPLATE.map((tpl) => ({
+      attribute: tpl.key,
+      value: product.specs?.[tpl.key] || "",
+    }));
 
     setFormData({
       productID: product.productID,
       name: product.name,
+      brand: product.brand || "",
       price: product.price,
       discountPrice: product.discountPrice || "",
       stock: product.stock || 0,
       description: product.description || "",
       image: imgUrl,
-      categoryID: product.categoryID || "",
       specs: formattedSpecs,
     });
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -186,8 +196,9 @@ const ProductManager = () => {
   );
 
   const inputClass =
-    "w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition";
-  const labelClass = "block mb-1 text-sm font-medium text-gray-700";
+    "w-full p-2.5 bg-white text-gray-900 placeholder-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition";
+
+  const labelClass = "block mb-1 text-sm font-medium text-gray-900";
 
   return (
     <div className="max-w-6xl mx-auto pb-20">
@@ -223,23 +234,24 @@ const ProductManager = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>
-                    Danh mục <span className="text-red-500">*</span>
+                    Hãng <span className="text-red-500">*</span>
                   </label>
                   <select
-                    name="categoryID"
+                    name="brand"
                     className={inputClass}
-                    value={formData.categoryID}
+                    value={formData.brand}
                     onChange={handleChange}
                     required
                   >
-                    <option value="">-- Chọn --</option>
-                    {categories.map((cat) => (
-                      <option key={cat.categoryID} value={cat.categoryID}>
-                        {cat.name}
+                    <option value="">-- Chọn hãng --</option>
+                    {brands.map((b) => (
+                      <option key={b.brand} value={b.brand}>
+                        {b.brand}
                       </option>
                     ))}
                   </select>
                 </div>
+
                 <div>
                   <label className={labelClass}>
                     Tồn kho <span className="text-red-500">*</span>
@@ -340,47 +352,43 @@ const ProductManager = () => {
               </button>
             </div>
 
-            <div className="space-y-3 bg-gray-50 p-5 rounded-xl border border-gray-200">
-              {formData.specs && formData.specs.length > 0 ? (
+            <div className="border border-gray-200 rounded-lg overflow-hidden bg-white">
+              {/* HEADER */}
+              <div className="grid grid-cols-12 bg-gray-100 text-sm font-semibold text-gray-700">
+                <div className="col-span-4 p-3">Thuộc tính</div>
+                <div className="col-span-7 p-3">Giá trị</div>
+              </div>
+
+              {/* BODY */}
+              {formData.specs.length > 0 ? (
                 formData.specs.map((spec, index) => (
                   <div
                     key={index}
-                    className="flex gap-3 items-center animate-fadeIn"
+                    className="grid grid-cols-12 border-t items-center"
                   >
-                    <div className="w-1/3">
-                      <input
-                        placeholder="Tên (VD: CPU)"
-                        className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none"
-                        value={spec.attribute}
-                        onChange={(e) =>
-                          handleSpecChange(index, "attribute", e.target.value)
+                    <div className="col-span-4 p-2">
+                      <div className="p-2 font-medium text-gray-700">
+                        {
+                          SPEC_TEMPLATE.find((s) => s.key === spec.attribute)
+                            ?.label
                         }
-                      />
+                      </div>
                     </div>
-                    <span className="text-gray-400 font-bold">:</span>
-                    <div className="flex-1">
+
+                    <div className="col-span-7 p-2">
                       <input
-                        placeholder="Giá trị (VD: Core i5 12400H)"
-                        className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 outline-none"
+                        className={inputClass}
                         value={spec.value}
                         onChange={(e) =>
                           handleSpecChange(index, "value", e.target.value)
                         }
                       />
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeSpec(index)}
-                      className="p-2 text-red-500 bg-white border border-red-200 rounded hover:bg-red-50 hover:text-red-700 transition shadow-sm"
-                      title="Xóa dòng này"
-                    >
-                      <Trash2 size={18} />
-                    </button>
                   </div>
                 ))
               ) : (
-                <div className="text-center py-6 text-gray-400 border-2 border-dashed border-gray-300 rounded-lg">
-                  Chưa có thông số nào. Hãy bấm nút "Thêm thông số" ở trên.
+                <div className="p-6 text-center text-gray-400 text-sm">
+                  Chưa có thông số. Bấm <b>“Thêm thông số”</b> để nhập.
                 </div>
               )}
             </div>
@@ -416,7 +424,7 @@ const ProductManager = () => {
           <Search className="text-gray-400" size={20} />
           <input
             type="text"
-            className="flex-1 outline-none text-gray-700"
+            className="flex-1 bg-white text-gray-800 placeholder-gray-400 outline-none"
             placeholder="Tìm kiếm sản phẩm..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -431,7 +439,7 @@ const ProductManager = () => {
               <th className="p-4">ID</th>
               <th className="p-4">Hình ảnh</th>
               <th className="p-4">Tên sản phẩm</th>
-              <th className="p-4">Danh mục</th>
+              <th className="p-4">Hãng</th>
               <th className="p-4">Giá bán</th>
               <th className="p-4">Kho</th>
               <th className="p-4 text-center">Hành động</th>
@@ -440,9 +448,6 @@ const ProductManager = () => {
           <tbody className="divide-y divide-gray-100">
             {filteredProducts.length > 0 ? (
               filteredProducts.map((p) => {
-                const catName =
-                  categories.find((c) => c.categoryID === p.categoryID)?.name ||
-                  "—";
                 return (
                   <tr
                     key={p.productID}
@@ -469,7 +474,7 @@ const ProductManager = () => {
                     </td>
                     <td className="p-4">
                       <span className="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">
-                        {catName}
+                        {p.brand || "—"}
                       </span>
                     </td>
                     <td className="p-4">

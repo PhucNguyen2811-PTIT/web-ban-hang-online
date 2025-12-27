@@ -7,6 +7,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProductsPage from "./pages/user/ProductsPage";
 import CartPage from "./pages/user/CartPage";
 import CheckoutPage from "./pages/user/CheckoutPage";
+import Profile from "./pages/user/Profile";
 
 // Import Admin pages
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -26,6 +27,7 @@ function App() {
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/cart" element={<CartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
 
           {/* Admin Routes */}

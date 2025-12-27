@@ -1,9 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 
 const slides = [
-  { id: 1, label: "Slide 1" },
-  { id: 2, label: "Slide 2" },
-  { id: 3, label: "Slide 3" },
+  {
+    id: 1,
+    image:
+      "https://cdn2.cellphones.com.vn/insecure/rs:fill:1036:450/q:100/plain/https://dashboard.cellphones.com.vn/storage/sdvsgdvgsfrg.png",
+  },
+  {
+    id: 2,
+    image:
+      "https://img.freepik.com/free-vector/electronics-store-facebook-cover-template_23-2151173109.jpg?semt=ais_hybrid&w=740&q=80",
+  },
+  {
+    id: 3,
+    image:
+      "https://img.freepik.com/free-psd/black-friday-super-sale-facebook-cover-banner-template_120329-5178.jpg?semt=ais_hybrid&w=740&q=80",
+  },
 ];
 
 export default function Carousel() {
@@ -50,14 +62,16 @@ export default function Carousel() {
         style={{ transform: `translateX(-${current * 100}%)` }}
       >
         {extendedSlides.map((slide, idx) => (
-          <div
-            key={idx}
-            className="shrink-0 w-full flex flex-col items-center justify-center"
-          >
-            <div className="w-3/4 h-40 sm:h-56 md:h-72 bg-gray-400 animate-pulse rounded-md flex items-center justify-center text-gray-600">
-              Hình ảnh chưa load
+          <div key={idx} className="relative shrink-0 w-full h-full">
+            <img
+              src={slide.image}
+              className="w-full h-full object-contain bg-black"
+            />
+
+            {/* Overlay chữ */}
+            <div className="absolute bottom-6 left-6 text-white text-2xl font-bold drop-shadow">
+              {slide.label}
             </div>
-            <p className="mt-2 text-gray-700 font-bold">{slide.label}</p>
           </div>
         ))}
       </div>

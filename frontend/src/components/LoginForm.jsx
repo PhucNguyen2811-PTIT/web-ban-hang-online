@@ -5,7 +5,7 @@ import { AuthContext } from "../context/AuthContext";
 export default function LoginForm() {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
-  
+
   // Thêm state loading để tránh bấm nhiều lần
   const [loading, setLoading] = useState(false);
 
@@ -67,17 +67,23 @@ export default function LoginForm() {
           name="email"
           placeholder="Email của bạn"
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md
+             text-gray-900 bg-white
+             placeholder-gray-400
+             focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
-      
+
       <div>
         <input
           type="password"
           name="password"
           placeholder="Mật khẩu"
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md
+             text-gray-900 bg-white
+             placeholder-gray-400
+             focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 

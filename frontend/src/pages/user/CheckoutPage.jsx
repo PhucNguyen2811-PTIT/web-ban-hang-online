@@ -23,9 +23,14 @@ export default function CheckoutPage() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/checkout", {
+      await axios.post("http://localhost:5000/api/order/checkout", {
         userID: user.userID,
-        paymentMethod: payment, // lưu để báo cáo cũng đẹp
+        paymentMethod: payment,
+        items: cartItems.map((item) => ({
+          productID: item.id, // id sản phẩm
+          price: item.price, // giá tại thời điểm mua
+          quantity: item.quantity,
+        })),
       });
 
       // Clear cart local
