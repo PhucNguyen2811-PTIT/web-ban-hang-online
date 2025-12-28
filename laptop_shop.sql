@@ -58,7 +58,7 @@ CREATE TABLE `orderitems` (
   KEY `productID` (`productID`),
   CONSTRAINT `orderitems_ibfk_1` FOREIGN KEY (`orderID`) REFERENCES `orders` (`orderID`),
   CONSTRAINT `orderitems_ibfk_2` FOREIGN KEY (`productID`) REFERENCES `products` (`productID`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -67,7 +67,7 @@ CREATE TABLE `orderitems` (
 
 LOCK TABLES `orderitems` WRITE;
 /*!40000 ALTER TABLE `orderitems` DISABLE KEYS */;
-INSERT INTO `orderitems` VALUES (1,2,3,5,NULL),(2,2,5,2,NULL),(3,2,7,1,NULL),(4,2,8,1,NULL),(5,3,6,1,NULL),(6,3,12,1,NULL),(7,4,6,1,NULL),(8,4,17,1,NULL),(9,5,5,1,27990000.00);
+INSERT INTO `orderitems` VALUES (9,5,5,1,27990000.00),(10,6,3,1,16000000.00),(11,6,6,1,18990000.00);
 /*!40000 ALTER TABLE `orderitems` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -90,7 +90,7 @@ CREATE TABLE `orders` (
   PRIMARY KEY (`orderID`),
   KEY `userID` (`userID`),
   CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -99,7 +99,7 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (2,2,NULL,NULL,'COD','pending','2025-12-13 21:15:35','2025-12-22 10:12:55'),(3,2,NULL,NULL,'COD','pending','2025-12-22 11:37:51','2025-12-22 11:37:51'),(4,2,NULL,NULL,'COD','pending','2025-12-27 20:06:13','2025-12-27 20:06:13'),(5,2,27990000.00,NULL,'COD','pending','2025-12-27 21:14:31','2025-12-27 21:14:31');
+INSERT INTO `orders` VALUES (5,2,27990000.00,NULL,'COD','pending','2025-12-27 21:14:31','2025-12-27 21:14:31'),(6,2,34990000.00,NULL,'COD','pending','2025-12-28 13:43:21','2025-12-28 14:13:52');
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -213,7 +213,7 @@ CREATE TABLE `tempcart` (
   KEY `productID` (`productID`),
   CONSTRAINT `tempcart_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`),
   CONSTRAINT `tempcart_ibfk_2` FOREIGN KEY (`productID`) REFERENCES `products` (`productID`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -265,4 +265,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-27 23:54:46
+-- Dump completed on 2025-12-28 14:32:14

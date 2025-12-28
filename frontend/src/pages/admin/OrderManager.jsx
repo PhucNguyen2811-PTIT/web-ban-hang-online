@@ -128,7 +128,7 @@ const OrderManager = () => {
                   <div className="flex flex-col gap-2 items-start">
                     {getStatusBadge(order.status)}
                     <select
-                      className="text-xs border border-gray-300 rounded p-1 outline-none focus:border-blue-500"
+                      className="text-xs border border-gray-300 rounded p-1 outline-none focus:border-blue-500 text-gray-900"
                       value={order.status}
                       onChange={(e) =>
                         updateStatus(order.orderID, e.target.value)
