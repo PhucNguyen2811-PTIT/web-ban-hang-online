@@ -12,7 +12,7 @@ export function CartProvider({ children }) {
     if (!user?.userID) return;
 
     axios
-      .get(`${import.meta.env.VITE_API_URL}/api/cart/${user.userID}`)
+      .get(`${import.meta.env.VITE_API_URL}cart/${user.userID}`)
       .then((res) => setCartItems(res.data))
       .catch(console.error);
   }, []);
