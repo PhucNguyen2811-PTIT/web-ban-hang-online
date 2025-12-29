@@ -5,21 +5,38 @@ import { AuthContext } from "../../context/AuthContext";
 import { LayoutDashboard, ShoppingBag, LogOut, Package } from "lucide-react";
 
 const AdminLayout = () => {
-  const { user, logout } = useContext(AuthContext);
+  const { user, logout, loading } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
+    if (loading) return;
+
     if (!user || user.role !== "admin") {
       navigate("/");
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
+
+  if (loading) return null;
 
   if (!user) return null;
 
   const menuItems = [
-    { path: "/admin/products", label: "Quản lý Sản phẩm", icon: <Package size={20} /> },
-    { path: "/admin/orders", label: "Quản lý Đơn hàng", icon: <ShoppingBag size={20} /> },
+    {
+      path: "/admin/products",
+      label: "Quản lý Sản phẩm",
+      icon: <Package size={20} />,
+    },
+    {
+      path: "/admin/orders",
+      label: "Quản lý Đơn hàng",
+      icon: <ShoppingBag size={20} />,
+    },
+    {
+      path: "/admin/revenue",
+      label: "Doanh thu",
+      icon: <LayoutDashboard size={20} />,
+    },
   ];
 
   return (
@@ -27,9 +44,9 @@ const AdminLayout = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200 shadow-sm fixed h-full z-10">
         <div className="p-6 flex items-center justify-center border-b border-gray-100">
-           <h1 className="text-2xl font-bold text-blue-600">Admin Panel</h1>
+          <h1 className="text-2xl font-bold text-blue-600">Admin Panel</h1>
         </div>
-        
+
         <nav className="p-4 space-y-2">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.path;

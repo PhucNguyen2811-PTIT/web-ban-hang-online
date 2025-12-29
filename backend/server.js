@@ -4,7 +4,7 @@ const orderRoutes = require("./routes/order.routes");
 app.use("/api/brands", brandRoutes);
 app.use("/api/order", orderRoutes);
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000; // dùng port của cloud nếu có, local fallback 5000
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

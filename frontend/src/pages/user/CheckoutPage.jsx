@@ -126,7 +126,10 @@ export default function CheckoutPage() {
           {/* ITEM LIST */}
           <div className="space-y-3 max-h-96 overflow-y-auto pr-2">
             {cartItems.map((item) => (
-              <div key={item.id} className="flex justify-between border-b pb-2">
+              <div
+                key={item.cartID}
+                className="flex justify-between border-b pb-2"
+              >
                 <span>
                   {item.name} x {item.quantity}
                 </span>

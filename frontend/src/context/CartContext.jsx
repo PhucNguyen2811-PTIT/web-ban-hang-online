@@ -4,51 +4,57 @@ import axios from "axios";
 export const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  const [cartItems, setCartItems] = useState(() => {
-    const saved = localStorage.getItem("cart");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [cartItems, setCartItems] = useState([]);
 
-  // Lưu vào localStorage mỗi khi cập nhật giỏ
+  // LOAD CART KHI APP MỞ
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-  }, [cartItems]);
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user?.userID) return;
 
-  // Thêm sản phẩm vào giỏ
-  const addToCart = (product) => {
-    setCartItems((prev) => {
-      const exists = prev.find((item) => item.id === product.id);
-      if (exists) {
-        return prev.map((item) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { ...product, quantity: 1 }];
+    axios
+      .get(`http://localhost:5000/api/cart/${user.userID}`)
+      .then((res) => setCartItems(res.data))
+      .catch(console.error);
+  }, []);
+
+  // Thêm sản phẩm
+  const addToCart = async (product) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user?.userID) return;
+
+    await axios.post("http://localhost:5000/api/cart/add", {
+      userID: user.userID,
+      productID: product.id,
     });
 
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (user?.userID) {
-      axios.post("http://localhost:5000/api/cart/add", {
-        userID: user.userID,
-        productID: product.id,
-        quantity: 1,
-      });
-    }
+    const res = await axios.get(
+      `http://localhost:5000/api/cart/${user.userID}`
+    );
+    setCartItems(res.data);
   };
 
-  // Xóa sản phẩm
-  const removeFromCart = (id) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  // Xóa
+  const removeFromCart = async (cartID) => {
+    await axios.delete(`http://localhost:5000/api/cart/${cartID}`);
+
+    setCartItems((prev) => {
+      const after = prev.filter((item) => item.cartID !== cartID);
+      return after;
+    });
   };
 
-  // Cập nhật số lượng (có chặn không xuống dưới 1)
-  const updateQuantity = (id, newQty) => {
-    if (newQty < 1) return; // chặn xuống dưới 1
+  // Update số lượng
+  const updateQuantity = async (cartID, newQty) => {
+    if (newQty < 1) return;
+
+    await axios.put("http://localhost:5000/api/cart/update", {
+      cartID,
+      quantity: newQty,
+    });
+
     setCartItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, quantity: newQty } : item
+        item.cartID === cartID ? { ...item, quantity: newQty } : item
       )
     );
   };

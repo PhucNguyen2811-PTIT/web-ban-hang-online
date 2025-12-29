@@ -9,5 +9,6 @@ r.put("/orders/:id/status", c.updateStatus);
 r.post("/products", c.createProduct);
 r.put("/products/:id", c.updateProduct);
 r.delete("/products/:id", c.deleteProduct);
+r.get("/revenue", c.getRevenue);
 
 module.exports = r;

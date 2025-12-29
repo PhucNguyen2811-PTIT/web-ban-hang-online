@@ -1,24 +1,24 @@
 import { createContext, useState, useEffect } from "react";
 
-// Tạo Context
 export const AuthContext = createContext();
 
-// Provider
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null); // thông tin user: {userID, name, email, role}
+  const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true); // 🔴 THÊM
 
-  // Khi app load, lấy từ localStorage nếu có
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     const storedToken = localStorage.getItem("token");
+
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
       setToken(storedToken);
     }
+
+    setLoading(false); // 🔴 RẤT QUAN TRỌNG
   }, []);
 
-  // Hàm login: nhận dữ liệu từ API
   const login = (userData, token) => {
     setUser(userData);
     setToken(token);
@@ -26,7 +26,6 @@ export function AuthProvider({ children }) {
     localStorage.setItem("token", token);
   };
 
-  // Hàm logout
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -35,7 +34,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

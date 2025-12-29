@@ -22,64 +22,82 @@ export default function CartPage() {
       {" "}
       <h1 className="text-3xl font-bold mb-6">Giỏ hàng</h1>
       <div className="space-y-4">
-        {cartItems.map((item) => (
-          <div
-            key={item.id}
-            className="flex items-center gap-4 p-4 border rounded-lg bg-white shadow-sm"
-          >
-            <img
-              src={item.image}
-              className="w-24 h-24 object-contain rounded border"
-            />
+        {cartItems.map((item) => {
+          let imageSrc = "";
 
-            <div className="flex-1">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {item.name}
-              </h2>
+          if (Array.isArray(item.image)) {
+            imageSrc = item.image[0];
+          } else if (typeof item.image === "string") {
+            try {
+              const parsed = JSON.parse(item.image);
+              imageSrc = parsed?.[0];
+            } catch {
+              imageSrc = item.image; // fallback nếu là string thường
+            }
+          }
+          console.log("FINAL IMAGE SRC:", imageSrc);
 
-              <p className="text-red-600 font-bold text-lg">
-                {item.price.toLocaleString()} đ
-              </p>
-
-              {/* Nút tăng giảm */}
-              <div className="flex items-center gap-3 mt-2">
-                <button
-                  onClick={() =>
-                    item.quantity > 1 &&
-                    updateQuantity(item.id, item.quantity - 1)
-                  }
-                  className={`px-3 py-1 border rounded ${
-                    item.quantity === 1
-                      ? "opacity-40 cursor-not-allowed"
-                      : "hover:bg-gray-200"
-                  }`}
-                >
-                  -
-                </button>
-
-                <span className="text-lg font-semibold">{item.quantity}</span>
-
-                <button
-                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                  className="px-3 py-1 border rounded hover:bg-gray-200"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <div className="text-right font-semibold text-lg text-gray-900 w-32">
-              {(item.price * item.quantity).toLocaleString()} đ
-            </div>
-
-            <button
-              onClick={() => removeFromCart(item.id)}
-              className="text-red-500 hover:text-red-700 text-sm"
+          return (
+            <div
+              key={item.cartID}
+              className="flex items-center gap-4 p-4 border rounded-lg bg-white shadow-sm"
             >
-              Xóa
-            </button>
-          </div>
-        ))}
+              <img
+                src={imageSrc}
+                alt={item.name}
+                className="w-24 h-24 object-contain rounded border"
+              />
+
+              <div className="flex-1">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {item.name}
+                </h2>
+
+                <p className="text-red-600 font-bold text-lg">
+                  {item.price.toLocaleString()} đ
+                </p>
+
+                <div className="flex items-center gap-3 mt-2">
+                  <button
+                    onClick={() =>
+                      item.quantity > 1 &&
+                      updateQuantity(item.cartID, item.quantity - 1)
+                    }
+                    className={`px-3 py-1 border rounded ${
+                      item.quantity === 1
+                        ? "opacity-40 cursor-not-allowed"
+                        : "hover:bg-gray-200"
+                    }`}
+                  >
+                    -
+                  </button>
+
+                  <span className="text-lg font-semibold">{item.quantity}</span>
+
+                  <button
+                    onClick={() =>
+                      updateQuantity(item.cartID, item.quantity + 1)
+                    }
+                    className="px-3 py-1 border rounded hover:bg-gray-200"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-right font-semibold text-lg w-32">
+                {(item.price * item.quantity).toLocaleString()} đ
+              </div>
+
+              <button
+                onClick={() => removeFromCart(item.cartID)}
+                className="text-red-500 hover:text-red-700 text-sm"
+              >
+                Xóa
+              </button>
+            </div>
+          );
+        })}
       </div>
       <div className="flex justify-between items-center mt-8 p-4 border-t text-gray-900">
         <span className="text-2xl font-bold">Tổng:</span>

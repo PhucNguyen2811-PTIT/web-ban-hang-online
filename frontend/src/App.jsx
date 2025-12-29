@@ -13,6 +13,7 @@ import Profile from "./pages/user/Profile";
 import AdminLayout from "./pages/admin/AdminLayout";
 import ProductManager from "./pages/admin/ProductManager";
 import OrderManager from "./pages/admin/OrderManager";
+import RevenueManager from "./pages/admin/RevenueManager";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route path="products" element={<ProductManager />} />
             <Route path="orders" element={<OrderManager />} />
+            <Route path="revenue" element={<RevenueManager />} />
           </Route>
         </Routes>
       </BrowserRouter>

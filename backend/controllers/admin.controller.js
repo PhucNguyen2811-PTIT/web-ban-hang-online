@@ -1,22 +1,23 @@
 const pool = require("../config/db");
 
-exports.getOrders = async (_, res) => {
+// Lấy tất cả đơn hàng (Admin)
+const getOrders = async (_, res) => {
   try {
+    // Lấy đơn hàng + thông tin user
     const [orders] = await pool.query(`
       SELECT 
         o.orderID,
         o.status,
         o.createdAt,
+        o.totalPrice,
         u.name AS userName,
-        u.email,
-        COALESCE(SUM(oi.price * oi.quantity), 0) AS totalPrice
+        u.email
       FROM orders o
       JOIN users u ON o.userID = u.userID
-      LEFT JOIN orderitems oi ON o.orderID = oi.orderID
-      GROUP BY o.orderID
       ORDER BY o.createdAt DESC
     `);
 
+    // Lấy chi tiết sản phẩm cho từng đơn
     for (let o of orders) {
       const [items] = await pool.query(
         `
@@ -40,15 +41,22 @@ exports.getOrders = async (_, res) => {
   }
 };
 
-exports.updateStatus = async (req, res) => {
-  await pool.query("UPDATE orders SET status=? WHERE orderID=?", [
-    req.body.status,
-    req.params.id,
-  ]);
-  res.json({ message: "Updated" });
+// Cập nhật trạng thái đơn hàng (Admin)
+const updateStatus = async (req, res) => {
+  try {
+    await pool.query("UPDATE orders SET status=? WHERE orderID=?", [
+      req.body.status,
+      req.params.id,
+    ]);
+    res.json({ message: "Updated" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Update status failed" });
+  }
 };
 
-exports.createProduct = async (req, res) => {
+// Tạo sản phẩm mới (Admin)
+const createProduct = async (req, res) => {
   const {
     name,
     brand,
@@ -65,11 +73,10 @@ exports.createProduct = async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    // 1. Insert product
     const [result] = await conn.query(
       `INSERT INTO products 
-      (name, brand, price, discountPrice, stock, description, image, is_deleted) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, 0)`,
+       (name, brand, price, discountPrice, stock, description, image, is_deleted) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, 0)`,
       [
         name,
         brand,
@@ -83,7 +90,6 @@ exports.createProduct = async (req, res) => {
 
     const productID = result.insertId;
 
-    // 2. Insert specs
     if (specs && typeof specs === "object") {
       for (const key in specs) {
         await conn.query(
@@ -105,7 +111,8 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-exports.updateProduct = async (req, res) => {
+// Cập nhật sản phẩm (Admin)
+const updateProduct = async (req, res) => {
   const {
     name,
     brand,
@@ -123,7 +130,7 @@ exports.updateProduct = async (req, res) => {
   try {
     await conn.beginTransaction();
 
-    // 1. Update products
+    // Update sản phẩm
     await conn.query(
       `UPDATE products
        SET name=?, brand=?, price=?, discountPrice=?, stock=?, description=?, image=?
@@ -140,10 +147,10 @@ exports.updateProduct = async (req, res) => {
       ]
     );
 
-    // 2. Xóa specs cũ
+    // Xóa specs cũ
     await conn.query("DELETE FROM productspecs WHERE productID=?", [productID]);
 
-    // 3. Insert specs mới
+    // Thêm specs mới
     if (specs && typeof specs === "object") {
       for (const key in specs) {
         if (specs[key]) {
@@ -167,9 +174,41 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-exports.deleteProduct = async (req, res) => {
-  await pool.query("UPDATE products SET is_deleted=1 WHERE productID=?", [
-    req.params.id,
-  ]);
-  res.json({ message: "Deleted" });
+// Xóa sản phẩm (Admin)
+const deleteProduct = async (req, res) => {
+  try {
+    await pool.query("UPDATE products SET is_deleted=1 WHERE productID=?", [
+      req.params.id,
+    ]);
+    res.json({ message: "Deleted" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Delete product failed" });
+  }
+};
+
+// Lấy doanh thu (Admin)
+const getRevenue = async (req, res) => {
+  try {
+    const [orders] = await pool.query(
+      "SELECT * FROM orders WHERE status='completed' ORDER BY createdAt DESC"
+    );
+    const totalRevenue = orders.reduce((sum, o) => sum + o.totalPrice, 0);
+    const totalOrders = orders.length;
+
+    res.json({ totalRevenue, totalOrders, orders });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Lỗi server" });
+  }
+};
+
+// Export tất cả hàm
+module.exports = {
+  getOrders,
+  updateStatus,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getRevenue,
 };

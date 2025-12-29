@@ -1,21 +1,25 @@
 const pool = require("../config/db");
 
 exports.add = async (req, res) => {
-  const { userID, productID, quantity = 1 } = req.body;
+  const { userID, productID } = req.body;
+  console.log("ADD CART CALLED:", { userID, productID });
   const [e] = await pool.query(
     "SELECT cartID FROM tempcart WHERE userID=? AND productID=?",
     [userID, productID]
   );
-  if (e.length)
-    await pool.query("UPDATE tempcart SET quantity=quantity+? WHERE cartID=?", [
-      quantity,
-      e[0].cartID,
-    ]);
-  else
+
+  if (e.length) {
     await pool.query(
-      "INSERT INTO tempcart (userID,productID,quantity) VALUES (?,?,?)",
-      [userID, productID, quantity]
+      "UPDATE tempcart SET quantity = quantity + 1 WHERE cartID=?",
+      [e[0].cartID]
     );
+  } else {
+    await pool.query(
+      "INSERT INTO tempcart (userID, productID, quantity) VALUES (?, ?, 1)",
+      [userID, productID]
+    );
+  }
+
   res.json({ message: "Added" });
 };
 
