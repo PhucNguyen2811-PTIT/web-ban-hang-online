@@ -12,7 +12,7 @@ export function CartProvider({ children }) {
     if (!user?.userID) return;
 
     axios
-      .get(`${import.meta.env.VITE_API_URL}cart/${user.userID}`)
+      .get(`${import.meta.env.VITE_API_URL}/cart/${user.userID}`)
       .then((res) => setCartItems(res.data))
       .catch(console.error);
   }, []);
@@ -22,7 +22,7 @@ export function CartProvider({ children }) {
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user?.userID) return;
 
-    await axios.post(`${import.meta.env.VITE_API_URL}cart/add`, {
+    await axios.post(`${import.meta.env.VITE_API_URL}/cart/add`, {
       userID: user.userID,
       productID: product.id,
     });
