@@ -14,7 +14,7 @@ export default function SignupForm({ navigate }) {
 
     if (password !== confirmPassword) return alert("Mật khẩu không khớp");
 
-    const res = await fetch("http://localhost:5000/api/signup", {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, phone, password }),

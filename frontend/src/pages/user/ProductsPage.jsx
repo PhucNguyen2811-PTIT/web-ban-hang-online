@@ -20,9 +20,9 @@ export default function ProductsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const all = await fetch("http://localhost:5000/api/products").then(
-          (res) => res.json()
-        );
+        const all = await fetch(
+          `${import.meta.env.VITE_API_URL}/products`
+        ).then((res) => res.json());
 
         setProducts(all);
         setFiltered(all);

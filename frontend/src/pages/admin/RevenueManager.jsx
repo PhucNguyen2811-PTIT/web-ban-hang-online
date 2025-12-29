@@ -14,9 +14,12 @@ export default function Revenue() {
     const fetchRevenue = async () => {
       if (!token) return; // chưa login → không fetch
       try {
-        const res = await axios.get("http://localhost:5000/api/admin/revenue", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/admin/revenue`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setData(res.data);
       } catch (err) {
         console.error("Lỗi lấy doanh thu:", err);

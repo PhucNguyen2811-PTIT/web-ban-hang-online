@@ -23,7 +23,7 @@ export default function CheckoutPage() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/order/checkout", {
+      await axios.post(`${import.meta.env.VITE_API_URL}/order/checkout`, {
         userID: user.userID,
         paymentMethod: payment,
         items: cartItems.map((item) => ({

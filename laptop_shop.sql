@@ -58,7 +58,7 @@ CREATE TABLE `orderitems` (
   KEY `productID` (`productID`),
   CONSTRAINT `orderitems_ibfk_1` FOREIGN KEY (`orderID`) REFERENCES `orders` (`orderID`),
   CONSTRAINT `orderitems_ibfk_2` FOREIGN KEY (`productID`) REFERENCES `products` (`productID`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -67,7 +67,7 @@ CREATE TABLE `orderitems` (
 
 LOCK TABLES `orderitems` WRITE;
 /*!40000 ALTER TABLE `orderitems` DISABLE KEYS */;
-INSERT INTO `orderitems` VALUES (9,5,5,1,27990000.00),(10,6,3,1,16000000.00),(11,6,6,1,18990000.00);
+INSERT INTO `orderitems` VALUES (1,1,5,5,27990000.00),(2,1,3,6,16000000.00),(3,2,17,2,19000000.00),(4,2,11,1,58999000.00),(5,3,27,2,45000000.00),(6,3,2,1,55000000.00),(7,4,7,1,30000000.00);
 /*!40000 ALTER TABLE `orderitems` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -81,7 +81,7 @@ DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
   `orderID` int NOT NULL AUTO_INCREMENT,
   `userID` int NOT NULL,
-  `totalPrice` decimal(10,2) DEFAULT NULL,
+  `totalPrice` bigint NOT NULL,
   `shippingAddress` text,
   `paymentMethod` enum('COD','bank','momo','vnpay') DEFAULT NULL,
   `status` enum('pending','in_progress','cancelled','completed') DEFAULT 'pending',
@@ -90,7 +90,7 @@ CREATE TABLE `orders` (
   PRIMARY KEY (`orderID`),
   KEY `userID` (`userID`),
   CONSTRAINT `orders_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -99,7 +99,7 @@ CREATE TABLE `orders` (
 
 LOCK TABLES `orders` WRITE;
 /*!40000 ALTER TABLE `orders` DISABLE KEYS */;
-INSERT INTO `orders` VALUES (5,2,27990000.00,NULL,'COD','pending','2025-12-27 21:14:31','2025-12-27 21:14:31'),(6,2,34990000.00,NULL,'COD','pending','2025-12-28 13:43:21','2025-12-28 14:13:52');
+INSERT INTO `orders` VALUES (1,4,235950000,NULL,'COD','cancelled','2025-12-28 21:54:29','2025-12-29 07:06:44'),(2,4,96999000,NULL,'COD','completed','2025-12-28 22:15:00','2025-12-29 07:01:34'),(3,2,145000000,NULL,'COD','completed','2025-12-28 22:26:11','2025-12-28 22:26:35'),(4,2,30000000,NULL,'COD','cancelled','2025-12-28 23:21:41','2025-12-29 06:43:58');
 /*!40000 ALTER TABLE `orders` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -213,7 +213,7 @@ CREATE TABLE `tempcart` (
   KEY `productID` (`productID`),
   CONSTRAINT `tempcart_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`),
   CONSTRAINT `tempcart_ibfk_2` FOREIGN KEY (`productID`) REFERENCES `products` (`productID`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -222,6 +222,7 @@ CREATE TABLE `tempcart` (
 
 LOCK TABLES `tempcart` WRITE;
 /*!40000 ALTER TABLE `tempcart` DISABLE KEYS */;
+INSERT INTO `tempcart` VALUES (39,2,7,2,'2025-12-29 20:10:38','2025-12-29 20:11:02'),(40,2,12,4,'2025-12-29 20:10:44','2025-12-29 20:11:01');
 /*!40000 ALTER TABLE `tempcart` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -243,7 +244,7 @@ CREATE TABLE `users` (
   `updatedAt` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`userID`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -252,7 +253,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'abd','abd@gmail.com','$2b$10$sK69WYtUzO5RpMsSlCKrnu3Cm5zVJFqkawA7xWruc5GaDggW4/kyq','0123','user','2025-11-23 21:06:56','2025-11-23 21:06:56'),(2,'ert','nhp@gmail.com','$2b$10$OZ0Ma9osHRqHwIiI3p4icOG.v/gXyv9pEim4OFXv3X1PMuo7DHRc6','2233','user','2025-11-23 22:43:48','2025-11-23 22:43:48'),(3,'Nguyễn Hoàng Phúc','ak47@gmail.com','$2b$10$64hSmBek.iemN51r3YA2x.7/Vq/rzUsZNONoJASc3rxObdR8KSH6O','0123','admin','2025-12-18 20:51:48','2025-12-18 21:13:26');
+INSERT INTO `users` VALUES (1,'abd','abd@gmail.com','$2b$10$sK69WYtUzO5RpMsSlCKrnu3Cm5zVJFqkawA7xWruc5GaDggW4/kyq','0123','user','2025-11-23 21:06:56','2025-11-23 21:06:56'),(2,'ert','nhp@gmail.com','$2b$10$OZ0Ma9osHRqHwIiI3p4icOG.v/gXyv9pEim4OFXv3X1PMuo7DHRc6','2233','user','2025-11-23 22:43:48','2025-11-23 22:43:48'),(3,'Nguyễn Hoàng Phúc','ak47@gmail.com','$2b$10$64hSmBek.iemN51r3YA2x.7/Vq/rzUsZNONoJASc3rxObdR8KSH6O','0123','admin','2025-12-18 20:51:48','2025-12-18 21:13:26'),(4,'Phúc','abcd@gmail.com','$2b$10$CIRp.9mrEeUe2zEz3BX.1.tYxyWawwRQDZhqlqCiZmzvMEuDQpY6q','111111111','user','2025-12-28 20:19:54','2025-12-28 20:19:54'),(5,'Nguyễn Hoàng Phúc','aaaa@gmail.com','$2b$10$OM5emxQhbYQBIxFATLMyw.d75ELiBJXSk67Kf/qR1qZpakWZYQRRK','0123456789','user','2025-12-29 20:11:43','2025-12-29 20:11:43');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -265,4 +266,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-28 14:32:14
+-- Dump completed on 2025-12-29 20:43:05

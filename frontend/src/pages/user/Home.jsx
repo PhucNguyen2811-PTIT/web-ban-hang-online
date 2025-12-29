@@ -13,12 +13,12 @@ export default function Home() {
     const loadData = async () => {
       try {
         const f = await fetch(
-          "http://localhost:5000/api/products/featured"
+          `${import.meta.env.VITE_API_URL}/products/featured`
         ).then((res) => res.json());
 
-        const all = await fetch("http://localhost:5000/api/products").then(
-          (res) => res.json()
-        );
+        const all = await fetch(
+          `${import.meta.env.VITE_API_URL}/products`
+        ).then((res) => res.json());
 
         setFeaturedProducts(f);
         setAllProducts(all);

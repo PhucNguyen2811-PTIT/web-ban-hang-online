@@ -54,7 +54,7 @@ export default function ProductDetail() {
   useEffect(() => {
     if (!product) {
       setLoading(true);
-      fetch(`http://localhost:5000/api/products/${id}`)
+      fetch(`${import.meta.env.VITE_API_URL}/products/${id}`)
         .then((res) => res.json())
         .then((data) => {
           console.log("Fetched product:", data);

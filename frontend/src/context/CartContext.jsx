@@ -12,7 +12,7 @@ export function CartProvider({ children }) {
     if (!user?.userID) return;
 
     axios
-      .get(`http://localhost:5000/api/cart/${user.userID}`)
+      .get(`${import.meta.env.VITE_API_URL}/api/cart/${user.userID}`)
       .then((res) => setCartItems(res.data))
       .catch(console.error);
   }, []);
@@ -22,20 +22,20 @@ export function CartProvider({ children }) {
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user?.userID) return;
 
-    await axios.post("http://localhost:5000/api/cart/add", {
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/cart/add`, {
       userID: user.userID,
       productID: product.id,
     });
 
     const res = await axios.get(
-      `http://localhost:5000/api/cart/${user.userID}`
+      `${import.meta.env.VITE_API_URL}/cart/${user.userID}`
     );
     setCartItems(res.data);
   };
 
   // Xóa
   const removeFromCart = async (cartID) => {
-    await axios.delete(`http://localhost:5000/api/cart/${cartID}`);
+    await axios.delete(`${import.meta.env.VITE_API_URL}/cart/${cartID}`);
 
     setCartItems((prev) => {
       const after = prev.filter((item) => item.cartID !== cartID);
@@ -47,7 +47,7 @@ export function CartProvider({ children }) {
   const updateQuantity = async (cartID, newQty) => {
     if (newQty < 1) return;
 
-    await axios.put("http://localhost:5000/api/cart/update", {
+    await axios.put(`${import.meta.env.VITE_API_URL}/cart/update`, {
       cartID,
       quantity: newQty,
     });

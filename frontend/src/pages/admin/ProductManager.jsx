@@ -31,8 +31,10 @@ const ProductManager = () => {
   // 1. Hàm load dữ liệu (Tách riêng để tái sử dụng)
   const fetchData = useCallback(async () => {
     try {
-      const resProducts = await fetch("http://localhost:5000/api/products");
-      const resBrands = await fetch("http://localhost:5000/api/brands");
+      const resProducts = await fetch(
+        `${import.meta.env.VITE_API_URL}/products`
+      );
+      const resBrands = await fetch(`${import.meta.env.VITE_API_URL}/brands`);
 
       setProducts(await resProducts.json());
       setBrands(await resBrands.json());
@@ -109,8 +111,8 @@ const ProductManager = () => {
 
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing
-      ? `http://localhost:5000/api/admin/products/${formData.productID}`
-      : "http://localhost:5000/api/admin/products";
+      ? `${import.meta.env.VITE_API_URL}/admin/products/${formData.productID}`
+      : `${import.meta.env.VITE_API_URL}/admin/products`;
 
     try {
       const res = await fetch(url, {
@@ -146,7 +148,7 @@ const ProductManager = () => {
     const token = localStorage.getItem("token");
     try {
       const res = await fetch(
-        `http://localhost:5000/api/admin/products/${id}`,
+        `${import.meta.env.VITE_API_URL}/admin/products/${id}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

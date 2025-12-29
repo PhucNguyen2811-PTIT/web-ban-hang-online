@@ -22,9 +22,12 @@ export default function Profile() {
 
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/order/my", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_URL}/order/my`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setOrders(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error("Lỗi lấy lịch sử đơn:", err);
@@ -80,8 +83,9 @@ export default function Profile() {
           <div className="w-20 h-20 rounded-full bg-blue-600 text-white flex items-center justify-center text-3xl font-bold">
             {user.name?.charAt(0).toUpperCase()}
           </div>
-          <h2 className="mt-3 text-xl font-semibold">{user.name}</h2>
-          <p className="text-sm text-gray-500">{user.email}</p>
+          <h2 className="mt-3 text-xl font-semibold text-gray-700">
+            {user.name}
+          </h2>
         </div>
 
         {/* Info */}
@@ -100,7 +104,9 @@ export default function Profile() {
 
         {/* Lịch sử đơn hàng */}
         <div>
-          <h3 className="text-lg font-semibold mb-3">Lịch sử đơn hàng</h3>
+          <h3 className="text-lg font-semibold mb-3 text-gray-700">
+            Lịch sử đơn hàng
+          </h3>
           {orders.length === 0 ? (
             <p className="text-sm text-gray-500">Chưa có đơn hàng nào</p>
           ) : (
@@ -150,7 +156,9 @@ export default function Profile() {
 
                           try {
                             await axios.put(
-                              `http://localhost:5000/api/order/${order.orderID}/cancel`,
+                              `${import.meta.env.VITE_API_URL}/order/${
+                                order.orderID
+                              }/cancel`,
                               {},
                               { headers: { Authorization: `Bearer ${token}` } }
                             );
