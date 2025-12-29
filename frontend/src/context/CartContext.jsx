@@ -22,7 +22,7 @@ export function CartProvider({ children }) {
     const user = JSON.parse(localStorage.getItem("user"));
     if (!user?.userID) return;
 
-    await axios.post(`${import.meta.env.VITE_API_URL}/api/cart/add`, {
+    await axios.post(`${import.meta.env.VITE_API_URL}cart/add`, {
       userID: user.userID,
       productID: product.id,
     });
