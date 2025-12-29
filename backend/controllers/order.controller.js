@@ -3,6 +3,8 @@ const pool = require("../config/db");
 const checkout = async (req, res) => {
   const conn = await pool.getConnection();
   try {
+    console.log("Checkout request body:", req.body); // log request
+
     await conn.beginTransaction();
 
     const userID = req.body.userID;
@@ -29,7 +31,8 @@ const checkout = async (req, res) => {
         [item.productID]
       );
 
-      if (!product) throw new Error("Product not found");
+      if (!product)
+        throw new Error(`Product not found for productID=${item.productID}`);
 
       subtotal += product.price * item.quantity;
 
@@ -64,8 +67,8 @@ const checkout = async (req, res) => {
     res.json({ orderID: o.insertId, totalPrice });
   } catch (err) {
     await conn.rollback();
-    console.error(err);
-    res.status(500).json({ error: "Checkout failed" });
+    console.error("Checkout error:", err); // log chi tiết
+    res.status(500).json({ error: "Checkout failed", message: err.message }); // trả message về frontend
   } finally {
     conn.release();
   }
